@@ -1,0 +1,25 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "CLI Tool - To do list.",
+  "main": "bin/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "To",
+    "do"
+  ],
+  "bin": {
+    "todo": "./bin/app.js"
+  },
+  "author": "Tomás Gutierrez / Ángel Szust",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "chalk-animation": "^2.0.3",
+    "figlet": "^1.5.2",
+    "prompt-sync": "^4.2.0",
+    "yargs": "^17.6.2"
+  }
+}
