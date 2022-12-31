@@ -1,85 +1,50 @@
 #! /usr/bin/env node
-
+const handler = require("./optionHandling")
 const yargs = require("yargs");
-const fs = require('fs');
-const readline = require('readline');
-const prompt = require("prompt-sync") ();
+const chalk = require('chalk')
+const figlet = require('figlet')
 
-class Event {
-    // static id = 0;
-    constructor(name, date, priority) {
-        // this.id = this.id++;
-        this.name = name;
-        this.date = date;
-        this.priority = priority;
-    }
-}
+console.log(chalk.yellow(figlet.textSync('Todo List', {
+    font: 'Standard',
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+    width: 80,
+    whitespaceBreak: true
+})))
 
-const path = require('os').homedir() + '/todo';
-const pathEventLogger = path + '/pel';
 
-if(!fs.existsSync(pathEventLogger)) {
-    const events = {
-        events: []
-    }
-    fs.writeFileSync(pathEventLogger, JSON.stringify(events), (err) => {
-        if(err) 
-            console.log("Error" + err);
-    });
-}
+handler.createTodoFolder() //checks if the todo folder in the homedir is created, and creates it if its not
+handler.createLog() // same with the logfile
 
-const options = yargs.
-        option("l", {alias: 'list', describe: 'Show to do list.', demandOption: false}).
-        option("a", {alias: 'add', describe: 'Add to the to do list.', type: 'int', demandOption: false}).
-        option("d", {alias: 'delete', describe: 'Delete from the to do list.', type: 'int', demandOption: false}).
-        option("m", {alias: 'modify', describe: 'Modify a event from the to do list.', type: 'int', demandOption: false}).
-        help(true).argv;
 
-if(!fs.existsSync(path))
-    fs.mkdir(path, (err) => {
-        if(err) 
-            console.log("Error" + err);
-    });
+//set up the options
+yargs.
+    option("l", { alias: 'list', describe: 'Show to do list.', demandOption: false }).
+    option("a", { alias: 'add', describe: 'Add to the to do list.', type: 'int', demandOption: false }).
+    option("d", { alias: 'delete', describe: 'Delete from the to do list.', type: 'int', demandOption: false }).
+    option("m", { alias: 'modify', describe: 'Modify a event from the to do list.', type: 'int', demandOption: false }).
+    option("e", { alias: 'empty', describe: 'Empty the list', demandOption: false }).
+    help(true).argv;
+
 
 const argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
-if(argv.l || argv.list) {
-    console.log('List of Events');
-    fs.readFile(pathEventLogger,
-        function(err, data) {
-            if(err) {
-                console.log("Error" + err);
-                process.exit();
-            }
-            var jsonParsed = JSON.parse(data);
-            jsonParsed.events.forEach(event => {
-                console.log('Event name: ' + event.name + ' the day ' + event.date + ' and priority ' + event.priority + ".");
-            });
-        }
-    );
+//if no option or more than one option are used, exit
+if (Object.keys(handler.optionsCalled(argv)).length == 0 || Object.keys(handler.optionsCalled(argv)).length > 1) {
+    console.log(chalk.red("You have to provide a valid parameter"));
+    process.exit(1);
 }
 
-if(argv.a || argv.add) {
-    console.log('Add a Event');
+//list 
+if (argv.l || argv.list) {
+    handler.list(argv)
+}
 
-    const name = prompt('What is the name of the Event? ');
-    const date = prompt('What is the date of the Event? ');
-    const priority = prompt('What is the priority of the Event? ');
+//add
+if (argv.a || argv.add) {
+    handler.add()
+}
 
-    const event = new Event(name, date, priority);
-
-    fs.readFile(pathEventLogger,
-        function(err, data) {
-            if(err) {
-                console.log("Error" + err);
-                process.exit();
-            }
-            var jsonParsed = JSON.parse(data);
-            jsonParsed.events.push(event);
-            fs.writeFileSync(pathEventLogger, JSON.stringify(jsonParsed), (err) => {
-                if(err) 
-                    console.log("Error" + err);
-            });
-        }
-    );
+if (argv.e || argv.empty) {
+    handler.empty();
 }
