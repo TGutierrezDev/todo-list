@@ -2,7 +2,7 @@
 const fs = require('fs')
 const chalk = require("chalk")
 const prompt = require("prompt-sync")();
-
+const dates = require("./dates.js")
 const path = require('os').homedir() + '/todo';
 const pathEventLogger = path + '/pel';
 
@@ -68,7 +68,7 @@ const optionsCalled = (argv) => {
 
 //print a formatted version of the log file
 const list = (argv) => {
-    var listOfEvents = 'List of Events';
+    var listOfEvents = 'List of Events\n';
     fs.readFile(pathEventLogger,
         function (err, data) {
             if (err) {
@@ -77,7 +77,8 @@ const list = (argv) => {
             }
             var jsonParsed = JSON.parse(data);
             jsonParsed.events.forEach(event => {
-                listOfEvents += chalk.red(event.name) + ' the day ' + chalk.green(event.date) + ' with a priority of ' + chalk.blue(event.priority) + ".";
+                listOfEvents += "*  " + chalk.red(event.name) + ' the day ' + chalk.green(new Date(event.date).toDateString())
+                    + ' with a priority of ' + chalk.blue(event.priority) + ".\n";
             });
 
             if (listOfEvents == 'List of Events')
@@ -89,13 +90,6 @@ const list = (argv) => {
 
 }
 
-
-//check if a given date is valid
-const checkDate = (date) => {
-    return true
-}
-
-
 //check if a given priority is valid
 const checkPriority = (priority) => {
     return priority >= 1 && priority <= 10
@@ -106,9 +100,11 @@ const add = () => {
     console.log('Add a Event');
 
     const name = prompt(chalk.red('What is the name of the Event? '));
-    var date = prompt(chalk.green('What is the date of the Event? '));
-    while (!checkDate(date)) {
-        date = prompt(chalk.green('INVALID DATE\nWhat is the date of the Event? '));
+    var dateStr = prompt(chalk.green('What is the date of the Event? '));
+    let date = new Date(dates.dateFormatter(dateStr))
+    while (date.toDateString() == "Invalid Date") {
+        dateStr = prompt(chalk.green('INVALID DATE\nWhat is the date of the Event? '));
+        date = new Date(dates.dateFormatter(dateStr))
     }
     var priority = prompt(chalk.blue('What is the priority of the Event? '));
     while (!checkPriority(priority)) {
