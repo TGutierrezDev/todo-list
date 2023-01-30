@@ -66,7 +66,7 @@ const optionsCalled = (argv) => {
 }
 
 function getListArgs(){
-    let args = prompt('Sort by? [d,p]')
+    let args = prompt('Sort by? [d,p] : ')
     
     while(1){
 
@@ -98,12 +98,9 @@ const list = (argv) => {
             }
             var jsonParsed = JSON.parse(data);
             //here i should sort the events to show them in a determinated order
-            jsonParsed.events =  sortBy(jsonParsed, argv)        
+            jsonParsed.events = sortBy(jsonParsed, argv)        
     
-            jsonParsed.events.forEach(event => {
-                listOfEvents += "*  " + chalk.red(event.name) + ' the day ' + chalk.green(new Date(event.date).toDateString())
-                    + ' with a priority of ' + chalk.blue(event.priority) + ".\n";
-            });
+            listOfEvents += parseEvents(jsonParsed.events, argv)
 
             if (listOfEvents == 'List of Events')
                 console.log("There are no events on the list")
@@ -113,6 +110,58 @@ const list = (argv) => {
     );
 
 }
+
+function parseEvents(events, args){
+    let listOfEvents = ""
+    switch(args){
+        case "d":
+            let strDate = events[0].date
+            let curDate = new Date(strDate)
+            listOfEvents += "-----" + curDate.toLocaleDateString("es") + " :\n"
+            
+            events.forEach(event => {
+                let auxDate = event.date
+                if(auxDate !=  strDate){
+                    strDate = auxDate
+                    curDate = new Date(strDate)
+                    listOfEvents += "\n-----" + curDate.toLocaleDateString("es") + " :\n"
+                }
+                
+                listOfEvents += "*  " + chalk.red(event.name) +
+                    ' , priority : ' + chalk.blue(event.priority) + ".\n";
+
+            })
+            break;
+        
+        case "p":
+            let curPriority = events[0].priority
+            listOfEvents += "With priority " + curPriority + ":\n"
+
+            events.forEach(event => {
+                let auxPriority = event.priority
+                if(auxPriority != curPriority){
+                    curPriority = auxPriority
+                    listOfEvents += "\nWith priority " + curPriority + ":\n"
+                }
+
+                listOfEvents += "*  " + chalk.red(event.name) + ' the day '
+                    + chalk.green(new Date(event.date).toLocaleDateString("es")) + ".\n"
+            })
+            break;
+        
+        default:
+            events.forEach(event => {
+                listOfEvents += "*  " + chalk.red(event.name) + ' the day '
+                    + chalk.green(new Date(event.date).toLocaleDateString("es"))
+                    + ' with a priority of ' + chalk.blue(event.priority) + ".\n";
+            })
+            break;
+    }
+
+    return listOfEvents
+}
+
+
 
 //check if a given priority is valid
 const checkPriority = (priority) => {
@@ -168,7 +217,7 @@ function sortByPriority(events){
 
 function sortBy(json, options){
     if(options.length == 0)
-        return json
+        return json.events
     let events = json.events
 
     if(options.length == 2){ //sort by date and priority
