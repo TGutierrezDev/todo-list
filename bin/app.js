@@ -3,6 +3,7 @@ const handler = require("./optionHandling")
 const yargs = require("yargs");
 const chalk = require('chalk')
 const figlet = require('figlet')
+const helper = require('./helper.js')
 
 console.log(chalk.yellow(figlet.textSync('Todo List', {
     font: 'Standard',
@@ -13,8 +14,8 @@ console.log(chalk.yellow(figlet.textSync('Todo List', {
 })))
 
 
-handler.createTodoFolder() //checks if the todo folder in the homedir is created, and creates it if its not
-handler.createLog() // same with the logfile
+helper.createTodoFolder() //checks if the todo folder in the homedir is created, and creates it if its not
+helper.createLog() // same with the logfile
 
 
 //set up the options
@@ -30,14 +31,14 @@ yargs.
 const argv = require('yargs/yargs')(process.argv.slice(2)).argv;
 
 //if no option or more than one option are used, exit
-if (Object.keys(handler.optionsCalled(argv)).length == 0 || Object.keys(handler.optionsCalled(argv)).length > 1) {
+if (Object.keys(helper.optionsCalled(argv)).length == 0 || Object.keys(helper.optionsCalled(argv)).length > 1) {
     console.log(chalk.red("You have to provide a valid parameter"));
     process.exit(1);
 }
 
 //list 
 if (argv.l || argv.list) {
-    let args =  handler.getListArgs()
+    let args =  helper.getListArgs()
     handler.list(args)
 }
 
@@ -45,7 +46,16 @@ if (argv.l || argv.list) {
 if (argv.a || argv.add) {
     handler.add()
 }
-
+//empty the list
 if (argv.e || argv.empty) {
     handler.empty();
 }
+//TODO Delete
+if (argv.d || argv.delete){
+    let args = helper.getDeleteArgs()
+    handler.delete(args) 
+}
+
+
+
+
