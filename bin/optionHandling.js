@@ -65,6 +65,27 @@ const optionsCalled = (argv) => {
     return options;
 }
 
+function getListArgs(){
+    let args = prompt('Sort by? [d,p]')
+    
+    while(1){
+
+        switch(args){
+            case "d":
+            case "p":
+            case "dp":
+            case "pd":
+            case "":
+                return args
+            default:
+                args = prompt('Sort by? [d,p]')
+
+        }
+
+    }
+
+
+}
 
 //print a formatted version of the log file
 const list = (argv) => {
@@ -76,6 +97,9 @@ const list = (argv) => {
                 process.exit();
             }
             var jsonParsed = JSON.parse(data);
+            //here i should sort the events to show them in a determinated order
+            jsonParsed.events =  sortBy(jsonParsed, argv)        
+    
             jsonParsed.events.forEach(event => {
                 listOfEvents += "*  " + chalk.red(event.name) + ' the day ' + chalk.green(new Date(event.date).toDateString())
                     + ' with a priority of ' + chalk.blue(event.priority) + ".\n";
@@ -128,7 +152,36 @@ const add = () => {
         }
     );
 }
+function sortByDate(events){
+    events.sort((a, b) => {
+        return new Date(a.date) - new Date(b.date)
+    })
+    return events
+}
 
+function sortByPriority(events){
+    events.sort((a,b) =>{
+        return b.priority - a.priority
+    })
+    return events
+}
+
+function sortBy(json, options){
+    if(options.length == 0)
+        return json
+    let events = json.events
+
+    if(options.length == 2){ //sort by date and priority
+        events = sortByDate(events)
+        events = sortByPriority(events)
+        return events
+    }
+
+    if(options[0] == 'd'){
+        return sortByDate(events)
+    }
+    return sortByPriority(events)
+}
 
 //deletes the logfile
 const empty = () => {
@@ -137,5 +190,5 @@ const empty = () => {
 
 
 module.exports = {
-    optionsCalled, list, add, createTodoFolder, createLog, empty
+    optionsCalled, list, add, createTodoFolder, createLog, empty, getListArgs
 };

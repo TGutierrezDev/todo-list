@@ -37,7 +37,8 @@ if (Object.keys(handler.optionsCalled(argv)).length == 0 || Object.keys(handler.
 
 //list 
 if (argv.l || argv.list) {
-    handler.list(argv)
+    let args =  handler.getListArgs()
+    handler.list(args)
 }
 
 //add
