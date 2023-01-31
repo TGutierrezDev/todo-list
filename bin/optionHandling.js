@@ -16,6 +16,9 @@ class Event {
         this.date = date;
         this.priority = priority;
     }
+    contains(name){
+        return true;
+    }
 }
 
 //print a formatted version of the log file
@@ -51,16 +54,18 @@ const checkPriority = (priority) => {
 const add = () => {
     console.log('Add a Event');
 
-    const name = prompt(chalk.red('What is the name of the Event? '));
-    var dateStr = prompt(chalk.green('What is the date of the Event? '));
+    const name = prompt(chalk.italic('What is the name of the Event? '));
+    var dateStr = prompt(chalk.italic('What is the date of the Event? '));
     let date = new Date(dates.dateFormatter(dateStr))
     while (date.toDateString() == "Invalid Date") {
-        dateStr = prompt(chalk.green('INVALID DATE\nWhat is the date of the Event? '));
+        console.log(chalk.red('INVALID DATE'))
+        dateStr = prompt(chalk.italic('What is the date of the Event? '))
         date = new Date(dates.dateFormatter(dateStr))
     }
-    var priority = prompt(chalk.blue('What is the priority of the Event? '));
+    var priority = prompt(chalk.italic('What is the priority of the Event? '));
     while (!checkPriority(priority)) {
-        priority = prompt(chalk.red('INVALID PRIORITY, choose a number between 1 - 10 '));
+        console.log(chalk.red('INVALID PRIORITY\n'))
+        priority = prompt(chalk.italic('choose a number between 1 - 10 '));
     }
 
     const event = new Event(name, date, priority);
@@ -79,6 +84,9 @@ const add = () => {
             });
         }
     );
+
+    console.log(chalk.green("The Event " + helper.eventParser(event) + " has been successfully added!"))
+
 }
 function sortByDate(events){
     events.sort((a, b) => {
@@ -116,6 +124,51 @@ const empty = () => {
     fs.rmSync(pathEventLogger)
 }
 
+function myIncludes(arr, item){
+    for(let i = 0; i < arr.length; i++){
+        let cur = arr[i]
+        if(cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
+            return true
+    }
+    return false
+}
+
+function myFilter(arr, item){
+    let ret = []
+    for(let i = 0; i < arr.length; i++){
+        let cur = arr[i]
+        if(cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
+            continue
+        ret.push(cur)
+    }
+    return ret
+}
+
+function deleteEvent(args){
+
+    let data = fs.readFileSync(pathEventLogger)
+    let jsonParsed = JSON.parse(data);
+    let events = jsonParsed.events 
+    //console.log(events)
+    //console.log(args)
+
+    let hasTheEvent = myIncludes(events, args) 
+    if(!hasTheEvent){
+        console.log("The Event " + args.name, args.date, args.priority + " is not contained in the list")
+        return
+    }
+
+    let resultArr = myFilter(events, args)
+    jsonParsed.events = resultArr
+
+    fs.writeFileSync(pathEventLogger, JSON.stringify(jsonParsed), (err) => {
+        if (err)
+            console.log(err);
+    });
+
+    console.log(chalk.green("The Event " + helper.eventParser(args) + " has been successfully deleted!"))
+}
+
 module.exports = {
-    list, add, empty 
+    list, add, empty, deleteEvent
 };

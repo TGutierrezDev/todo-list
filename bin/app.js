@@ -53,9 +53,13 @@ if (argv.e || argv.empty) {
 //TODO Delete
 if (argv.d || argv.delete){
     let args = helper.getDeleteArgs()
-    handler.delete(args) 
+    handler.deleteEvent(args) 
 }
-
+//TODO modify
+if (argv.m || argv.modify){
+    let args = helper.getModifyArgs()
+    handler.modify(args)
+}
 
 
 
