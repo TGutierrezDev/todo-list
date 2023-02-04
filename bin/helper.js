@@ -161,8 +161,7 @@ function getDeleteArgs(){
             name = prompt('Name : ')
             date = prompt('Date : ')
             priority = prompt('Priority : ')
-            return {'name' : name, 'date' : new Date(date), 'priority' : priority}
-
+            return new Event(name, new Date(dates.dateFormatter(date)).toISOString(), priority) 
         case "2":
             name = prompt('Name : ')
             options = getEventsWithName(name)
