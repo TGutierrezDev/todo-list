@@ -16,7 +16,7 @@ class Event {
         this.date = date;
         this.priority = priority;
     }
-    contains(name){
+    contains(name) {
         return true;
     }
 }
@@ -25,15 +25,15 @@ class Event {
 const list = (argv) => {
     var listOfEvents = 'List of Events\n';
     fs.readFile(pathEventLogger,
-        function (err, data) {
+        function(err, data) {
             if (err) {
                 console.log("Error" + err);
                 process.exit();
             }
             var jsonParsed = JSON.parse(data);
             //here i should sort the events to show them in a determinated order
-            jsonParsed.events = sortBy(jsonParsed, argv)        
-    
+            jsonParsed.events = sortBy(jsonParsed, argv)
+
             listOfEvents += helper.parseEvents(jsonParsed.events, argv)
 
             if (listOfEvents == 'List of Events')
@@ -71,7 +71,7 @@ const add = () => {
     const event = new Event(name, date, priority);
 
     fs.readFile(pathEventLogger,
-        function (err, data) {
+        function(err, data) {
             if (err) {
                 console.log(err);
                 process.exit();
@@ -88,32 +88,32 @@ const add = () => {
     console.log(chalk.green("The Event " + helper.eventParser(event) + " has been successfully added!"))
 
 }
-function sortByDate(events){
+function sortByDate(events) {
     events.sort((a, b) => {
         return new Date(a.date) - new Date(b.date)
     })
     return events
 }
 
-function sortByPriority(events){
-    events.sort((a,b) =>{
+function sortByPriority(events) {
+    events.sort((a, b) => {
         return b.priority - a.priority
     })
     return events
 }
 
-function sortBy(json, options){
-    if(options.length == 0)
+function sortBy(json, options) {
+    if (options.length == 0)
         return json.events
     let events = json.events
 
-    if(options.length == 2){ //sort by date and priority
+    if (options.length == 2) { //sort by date and priority
         events = sortByDate(events)
         events = sortByPriority(events)
         return events
     }
 
-    if(options[0] == 'd'){
+    if (options[0] == 'd') {
         return sortByDate(events)
     }
     return sortByPriority(events)
@@ -124,36 +124,34 @@ const empty = () => {
     fs.rmSync(pathEventLogger)
 }
 
-function myIncludes(arr, item){
-    for(let i = 0; i < arr.length; i++){
+function myIncludes(arr, item) {
+    for (let i = 0; i < arr.length; i++) {
         let cur = arr[i]
-        if(cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
+        if (cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
             return true
     }
     return false
 }
 
-function myFilter(arr, item){
+function myFilter(arr, item) {
     let ret = []
-    for(let i = 0; i < arr.length; i++){
+    for (let i = 0; i < arr.length; i++) {
         let cur = arr[i]
-        if(cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
+        if (cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
             continue
         ret.push(cur)
     }
     return ret
 }
 
-function deleteEvent(args){
+function deleteEvent(args) {
 
     let data = fs.readFileSync(pathEventLogger)
     let jsonParsed = JSON.parse(data);
-    let events = jsonParsed.events 
-    //console.log(events)
-    //console.log(args)
+    let events = jsonParsed.events
 
-    let hasTheEvent = myIncludes(events, args) 
-    if(!hasTheEvent){
+    let hasTheEvent = myIncludes(events, args)
+    if (!hasTheEvent) {
         console.log("The Event " + args.name, args.date, args.priority + " is not contained in the list")
         return
     }
