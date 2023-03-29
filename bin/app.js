@@ -50,7 +50,7 @@ if (argv.a || argv.add) {
 if (argv.e || argv.empty) {
     handler.empty();
 }
-//TODO Delete
+//delete an event
 if (argv.d || argv.delete){
     let args = helper.getDeleteArgs()
     handler.deleteEvent(args) 

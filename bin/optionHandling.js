@@ -125,8 +125,6 @@ const empty = () => {
 }
 
 function myIncludes(arr, item){
-    console.log(arr)
-    console.log(item)
     for(let i = 0; i < arr.length; i++){
         let cur = arr[i]
         if(cur.name == item.name && cur.date == item.date && cur.priority == item.priority)
